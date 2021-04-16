@@ -1,0 +1,210 @@
+(1) The rules are context-sensitive, with the following forms (stated with their context-sensitive equivalents), where
+	-	q, q` and q´ are non-terminals,
+	-	x is a terminal and x⁺ is a sequence of 1 or more termnals and
+	-	α is a non-empty sequence of terminals and non-terminals.
+	-	λ is the empty sequnce
+Syntax Rules:
+	q → α
+	q` q → q` α	⇔	q → α \ ( q` ‥ )
+	q q´ → α q´	⇔	q → α \ ( ‥  q´ )
+Lexical Rules:
+	q → x⁺
+	q` q → x	⇔	q → x	∧	q` → λ \ ( ‥ x )
+	q q´ → x	⇔	q → x	∧	q´ → λ \ ( x ‥ )
+	q` q q´ → x	⇔	q → x	∧	q` → λ \ ( ‥ x )	∧ q´ → λ \ ( x ‥ )
+
+(2) The parser is bottom-up, it is made deterministic by applying the "longest matching context first" precedence rule.
+	-	The syntax rules are processed in a master switch statement, with a 3 symbol look-ahead; the rules are handled by "squash" and "reduce".
+	-	The lexical rules are processed separately; the λ rules are handled by the "sc0" macro, the other rules by the "sc{1,2,3,4}" macros.
+	-	This appears to be an application of some kind of unpublished research by Knuth to extend his LR formalism to context-sensitive and natural language grammars.
+
+(3) No one non-terminal is the start symbol ― they all are.
+	-	This is a grammar for μx↑·f↑(x↑), where x↑ is the vector of all the non-terminals.
+	-	Macro bodies are parsed as expressions or statements, wherever possible.
+
+(4) The following is a rough equivalent to a Prolog-like DCT grammar.
+	-	The syntax rules are numbered, as in the weave.web file; rule 33 is mistakenly named by weave.web as 31 (I sent Knuth a bug note).
+	-	‛·’		= ‛\&{K}’, for a keyword terminal K.
+	-	‛Σ’		= the modified form of S, for a string terminal S.
+	-	‛comment’	= not a category code; but is combined with a previous ‛omega’ or ‛semi’, or following ‛terminator’; or else is inserted as a ‛terminator’.
+	-	The symbols denoted here by < ⁆ ! ‼ x X † ¦ - ↔ o + are respectively named:
+			‛indent’ ‛outdent’ ‛force’ ‛big_force’ ‛cancel’ ‛big_cancel’ ‛opt’ ‛break_space’ ‛backup’ ‛math_rel’ ‛math_op’ ‛math_bin’
+	-	‛math_rel’ ‛math_op’ ‛math_bin’ are rendered internally as ‛\mathbin{’ ‛\mathrel{’ ‛\mathop{’, respectively.
+	-	‛indent’ ‛outdent’ ‛opt’ ‛backup’ ‛break_space’ ‛force’ ‛big_force’ are rendered ‛\1’ ‛\2’ ‛\3’ ‛\4’ ‛\5’ ‛\6’ ‛\7’, respectively.
+	-	A special ‛end_translation’ token marks the end of text: ‟comment” consisting of ‛cancel’ or ‛force’.
+	-	The byte-code text associated with each item is listed as ‹⋯›; including terminals.
+
+	alpha‹·›		→ ‹array›
+	alpha‹·›		→ ‹file›
+	alpha‹!·›		→ ‹for›
+	alpha‹·›		→ ‹set›
+	alpha‹!·›		→ ‹while›
+	alpha‹!·›		→ ‹with›
+	alpha‹!·›		→ ‹case›
+	alpha‹!·›		→ ‹if›
+	alpha‹!\~›		→ λ						‥ ‹xclause›
+
+6	beginning‹b¦S›		→ beginning‹b› stmt‹S›						// compound statement grows
+	beginning‹!·x›		→ ‹begin›
+	beginning‹!<·x›		→ ‹repeat›
+
+7	case_head‹H⁆KC›		→ case_head‹H› casey‹K› clause‹C›				// variant records
+9	case_head‹H!S›		→ case_head‹H› stmt‹S›						// case statement grows
+10	case_head‹KC›		→ casey‹K› clause‹C›						// beginning of case statement
+41	case_head‹<Rx›		→ record_head‹R›						// other «·record·» structures
+
+40	casey‹RI xC›		→ record_head‹R› intro‹I› casey‹C›				// «·record case·» …
+	casey‹›			→ λ						‥ ‹case›
+
+2	clause‹A $M$ <O›	→ alpha‹A› math‹M› omega‹O›					// e.g., while ‹x > 0)
+3	clause‹A <O›		→ alpha‹A› omega‹O›						// e.g., file of
+12	clause‹BC¦SE x›		→ cond‹B› clause‹C› stmt‹S› elsie‹E›				// complete conditional
+	clause‹›		→ λ						‹until› ‥
+
+	close‹]›		→ ‹.)›
+	close‹)›		→ ‹)›
+	close‹]›		→ ‹]›
+	close‹!·›		→ ‹end›
+	close‹!-·›		→ ‹until›
+
+	colon‹:›		→ ‹:›
+
+	comment‹‼›		→ ‹@#›
+	comment‹!›		→ ‹@/›
+	comment‹X\ X›		→ ‹@+›
+
+	cond‹›			→ λ						‥ ‹if›
+
+	elsie‹!-·›		→ ‹else›
+
+	exp‹\E{›		→ ‹E›								// in constant
+
+14	intro‹E›		→ elsie‹E›							// unmatched else
+19	intro‹!-$M$:›		→ math‹M› colon‹:›						// compound label
+44	intro‹!-S:›		→ simp‹S› colon‹:›						// simple label
+52	intro‹$M$:›		→ math‹M› colon‹:›				var_head ‥	// variable declaration
+53	intro‹S:›		→ simp‹S› colon‹:›				var_head ‥	// variable declaration
+	intro‹!-·›		→ ‹const›
+	intro‹·›		→ ‹goto›
+	intro‹!-·›		→ ‹label›
+	intro‹·›		→ ‹packed›
+	intro‹!-·›		→ ‹type›
+	intro‹›			→ λ						‹begin› ‥
+	intro‹›			→ λ						‹repeat› ‥
+	intro‹›			→ λ						‹record› ‥
+	intro‹›			→ λ						‹var› ‥
+	intro‹<\ ›		→ λ						‹function› ‥
+	intro‹<\ ›		→ λ						‹procedure› ‥
+	intro‹<\ ›		→ λ						‹program› ‥
+
+1	math‹M:›		→ math‹M› colon‹:›				alpha ‥		// e.g., switch ‹v:bool) {
+4	math‹S›			→ simp‹S›					alpha ‥		// covert to math mode
+15	math‹EMS}›		→ exp‹E› math‹M› simp‹S›			‥ !simp		// signed exponent
+16	math‹ES}›		→ exp‹E› simp‹S›				‥ !simp		// unsigned exponent
+20	math‹M₀M₁›		→ math‹M₀› math‹M₁›						// simple concatenation
+21	math‹MS›		→ math‹M› simp‹S›						// simple concatenation
+26	math‹p$xHx⁆$q›		→ open‹p› case_head‹H› close‹q›					// case in field list
+27	math‹p\,q›		→ open‹p› close‹q›						// empty set []
+28	math‹pM$xHx⁆$q›		→ open‹p› math‹M› case_head‹H› close‹q›				// case in field list
+29	math‹pMq›		→ open‹p› math‹M› close‹q›					// parenthesized group
+30	math‹M:›		→ math‹M› colon‹:›				open ‥		// colon in parentheses
+31	math‹MoxZ}›		→ math‹M› proc‹Z› intro‹I›			open ‥		// procedure in parentheses
+32	math‹Md\,†5›		→ math‹M› semi‹d›				open ‥		// semicolon in parentheses
+33	math‹MoxV}›		→ math‹M› var_head‹V› intro‹I›			open ‥		// var in parentheses
+34	math‹oxZ}›		→ proc‹Z› intro‹I›				open ‥		// procedure in parentheses
+35	math‹S›			→ simp‹S›					open ‥		// convert to math mode
+36	math‹p$xSx$q›		→ open‹p› stmt‹S› close‹q›					// field list
+37	math‹oxV}›		→ var_head‹V› intro‹I›				open ‥		// var in parentheses
+45	math‹SM›		→ simp‹S› math‹M›						// simple concatenation
+	math‹\I›		→ ‹<>›
+	math‹\L›		→ ‹<=›
+	math‹\G›		→ ‹>=›
+	math‹\K›		→ ‹:=›
+	math‹\S›		→ ‹==›
+	math‹\B›		→ ‹‹*›
+	math‹\T›		→ ‹*)›
+	math‹#›			→ ‹#›
+	math‹$›			→ ‹$›
+	math‹_›			→ ‹_›
+	math‹%›			→ ‹%›
+	math‹^›			→ ‹^›
+	math‹*›			→ ‹*›
+	math‹,†9›		→ ‹,›
+	math‹→›			→ ‹..›
+	math‹C›			→ character‹C›							// characters other than those listed in other lexical rules
+	math‹\W›		→ ‹and›
+	math‹+·}›		→ ‹div›
+	math‹↔·}›		→ ‹downto›
+	math‹\in›		→ ‹in›
+	math‹+·}›		→ ‹mod›
+	math‹\R›		→ ‹not›
+	math‹\V›		→ ‹or›
+	math‹↔·}›		→ ‹to›
+	math‹\,›		→ ‹@,›
+	math‹\J›		→ ‹@&›
+	math‹\B›		→ ‹@{›
+	math‹\T›		→ ‹@}›
+
+46	mod_scrap‹SX›		→ simp‹S› mod_scrap‹X›						// in emergencies
+	mod_scrap‹\Xn:M\X›	→ ‹@<› module‹M› ‹@>›
+
+	omega‹·›		→ ‹do›
+	omega‹·›		→ ‹of›
+	omega‹·›		→ ‹then›
+	omega‹·›		→ ‹xclause›
+
+	open‹[›			→ ‹(.›
+	open‹(›			→ ‹‹›
+	open‹[›			→ ‹[›
+
+39	proc‹Z¦S›		→ proc‹Z› stmt‹S›						// procedure declaration grows
+	proc‹!-·x›		→ ‹function›
+	proc‹!-·x›		→ ‹procedure›
+	proc‹!-·x›		→ ‹program›
+
+	record_head‹·›		→ ‹record›
+
+	semi‹;›			→ ‹;›
+	semi‹›			→ ‹@;›
+
+25	simp‹X›			→ mod_scrap‹X›							// module unlike a statement
+47	simp‹S₀S₁›		→ simp‹S₀› simp‹S₁›						// simple concatenation
+	simp‹\.{"Σ"}›		→ ‹"› string‹S› ‹"›
+	simp‹\.{'Σ'}›		→ ‹'› string‹S› ‹'›
+	simp‹\={Σ}›		→ ‹@=› string‹S› ‹@>›
+	simp‹.›			→ ‹.›
+	simp‹\{I}›		→ identifier‹I›
+	simp‹D›			→ digit‹D›
+	simp‹·›			→ ‹nil›
+	simp‹\O{K}›		→ ‹@'› const‹K›
+	simp‹\H{K}›		→ ‹@"› const‹K›
+	simp‹\)›		→ ‹@$›
+	simp‹\]›		→ ‹@\›
+	simp‹S›			→ ‹@t› stuff‹S› ‹@>›
+	simp‹†0›		→ ‹@|›
+
+5	stmt‹bqS›		→ beginning‹b› close‹q› stmt‹S›					// compound statement ends
+5	stmt‹bqd›		→ beginning‹b› close‹q› terminator‹d›				// compound statement ends
+8	stmt‹Hx⁆qd›		→ case_head‹H› close‹q› terminator‹d›				// end of case statement
+11	stmt‹C¦Sx⁆!›		→ clause‹C› stmt‹S›						// end of controlled statement
+13	stmt‹BC¦Sx⁆!›		→ cond‹B› clause‹C› stmt‹S›					// incomplete conditional
+17	stmt‹I †7xS›		→ intro‹I› stmt‹S›						// labeled statement, etc.
+18	stmt‹$M$›		→ math‹M›					‥ close		// end of field list
+22	stmt‹$M$<¦Sx⁆!›		→ math‹M› stmt‹S›						// macro or type definition
+23	stmt‹$M$d›		→ math‹M› terminator‹d›						// statement involving math
+24	stmt‹Xd!›		→ mod_scrap‹X› terminator‹d›					// module like a statement
+24	stmt‹Xd!›		→ mod_scrap‹X› semi‹d›						// module like a statement
+38	stmt‹Zx⁆bqd›		→ proc‹Z› beginning‹b› close‹q› terminator‹d›			// end of procedure declaration
+43	stmt‹S›			→ simp‹S›					‥ close		// end of field list
+48	stmt‹Sd›		→ simp‹S› terminator‹d›						// simple statement
+49	stmt‹S₀¦S₁›		→ stmt‹S₀› stmt‹S₁›						// adjacent statements
+50	stmt‹d›			→ terminator‹d›							// empty statement
+51	stmt‹V›			→ var_head‹V›					‥ beginning	// end of variable declarations
+
+42	terminator‹d›		→ semi‹d›							// semicolon after statement
+	terminator‹›		→ λ						‥ ‹else›
+	terminator‹›		→ λ						‥ ‹end›
+	terminator‹›		→ λ						‥ ‹until›
+
+54	var_head‹V¦S›		→ var_head‹V› stmt‹S›						// variable declarations grow
+	var_head‹!-·x›		→ ‹var›

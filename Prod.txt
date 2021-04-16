@@ -1,0 +1,208 @@
+// This file is part of CWEB.
+// This program by Silvio Levy and Donald E. Knuth is based on a program by Knuth.
+// It is distributed WITHOUT ANY WARRANTY, express or implied.
+// Version 3.6 --- May 2000
+
+‡1:
+Here is a table of all the productions.
+Each production that combines two or more consecutive scraps implicitly inserts a {‹tt›‹$›} where necessary,
+that is, between scraps whose abutting boundaries have different ≪mathness≫.
+In this way we never get double {‹tt›‹$›‹$›}.
+
+// The following kludge is needed because ‹newcount›, ‹newdimen›, and ‹+› are "‹outer›" control sequences that cannot be used in skipped text!
+‹fi› ‹newcount› ‹NumR› ‹newdimen› ‹MidX› ‹let› ‹+› ‹relax› ‹ifon›
+
+A translation is provided when the resulting scrap is not merely a juxtaposition of the scraps it comes from.
+Notes:
+‡	next to a scrap means that its first identifier gets an underlined entry in the index, via the function ≪make_underlined≫.
+§	next to a scrap means that both ≪make_underlined≫ and ≪make_reserved≫ are called; that is, the identifier's ilk becomes ≪raw_int≫.
+†	next to a production number refers to the notes at the end of this section, which deal with various exceptional cases.
+
+We use «·in·», «·out·», «·back·» and «·bsp·» as shorthands for ≪indent≫, ≪outdent≫, ≪backup≫ and ≪break_space≫, respectively.
+
+‹def›‹Alt2› #1 #2 {$ ‹displaystyle› ‹Bigl:{› ‹matrix›{
+	┎	‹strut›	‹hbox›{#1}	┒‹cr›
+	┖	‹strut›	‹hbox›{#2}	┚‹cr›
+} ‹Bigr:}› $}
+‹def›‹Alt3› #1 #2 #3 {$ ‹displaystyle› ‹Biggl:{› ‹matrix›{
+	┎	‹strut›	‹hbox›{#1}	┒‹cr›
+	┃		‹hbox›{#2}	┃‹cr›
+	┖	‹strut›	‹hbox›{#3}	┚‹cr›
+} ‹Biggr:}› $}
+‹def›‹AltM2› #1 #2 {$ ‹displaystyle› ‹matrix›{
+	┌‹strut›‹hbox›{#1}‹hfill›	┐‹cr›
+	└‹strut›‹hbox›{#2}‹hfill›	┘‹cr›
+} $}
+‹def›‹AltM3› #1 #2 #3 {$ ‹displaystyle› ‹matrix›{
+	┌‹strut›‹hbox›{#1}‹hfill›	┐‹cr›
+	│	‹hbox›{#2}‹hfill›	│‹cr›
+   	└‹strut›‹hbox›{#3}‹hfill›	┘‹cr›
+} $}
+
+‹MidX› = 2.5 in
+≪exp≫ Ex, ≪stmt≫ St, ≪decl≫ Dec, ≪fn_decl≫ FnDec, ≪decl_head≫ DecH, ≪cast≫ Cast, ≪insert≫ Insert, ≪tag≫ Tag
+≪unop≫ UnOp, ≪binop≫ BinOp, ≪ubinop≫ Op, ≪in≫ In, ≪base≫ Base
+≪int_like≫ Int, ≪if_like≫ If, ≪else_like≫ Else, ≪const_list≫ Const, ≪case_like≫ Case
+≪lbrace≫ ‹{›, ≪rbrace≫ ‹}›, ≪colon≫ ‹:›, ≪semi≫ ‹;›, ≪colcol≫ ‹::›, ≪lpar≫ ‹(›, ≪rpar≫ ‹)›, ≪comma≫ ‹,›
+
+	LHS					⇐ RHS‹Translation›			Example
+ 	┌«·any·»		┐		⇐ ┌«·any·»			┐
+0	│«·any·» «·any·»	│ Insert	⇐ │«·any·» «·any·»		│	St; \ /$\ast‹,›$comment$‹,›*$/
+	└«·any·» «·any·» «·any·»┘		⇐ └«·any·» «·any·» «·any·»	┘
+ 	      ┌ «{» ┐				⇐                 ┌ «{» ┐		┏ «·main·»()$«{›$				┒
+1	Ex‹E› │ Int │				⇐ FnDec‹E‡ In In› │ Int │		┃						┃
+ 	      └ Dec ┘				⇐                 └ Dec ┘		┖ «·main·»$(«·ac·»,«·av·»)$ ‟int” «·ac·»;	┚
+2	Ex UnOp					⇐ Ex					x++
+3	Ex ┌ BinOp ┐ Ex				⇐ Ex					┎  x/y  ┒
+ 	   └  Op   ┘ 				⇐   					┖ x + y ┚
+4	Ex‹E₀› «,» Ex‹E₁›			⇐ Ex‹E₀C ≪opt≫9 E₁›			f(x,y)
+5	Ex ┌ «()» ┐ «:»				⇐ Ex ┌ «()» ┐ Base			┏   &C():   ┒
+ 	   └ Cast ┘    				⇐    └ Cast ┘				┗ &C(int i):┚
+6	Ex «;»					⇐ St					x=0;
+7	Ex‹E› «:»				⇐ Tag‹E‡C›				found:
+8	Ex «}»					⇐ St «}»				end of ‟enum” list
+9	Ex ┌ «( » ┐ ┌ Case  ┐			⇐ Ex ┌ «()» ┐ ‹R = R C, C₀ = C₀ C₁›	┎   f() const   ┒
+ 	   └ Cast ┘ └ Const ┘			⇐    └ Cast ┘				┖ f(int) throw  ┚
+10	Ex ┌  Ex  ┐				⇐ Ex					time()
+	   └ Cast ┘
+11	«(» ┌ Ex ┐ «)»				⇐ Ex					┎ (x) ┒
+	    └ Op ┘									┖ (*) ┚
+12	«()»					⇐ Ex‹«(\,)»›				functions, declarations
+13	«(» ┌ DecH ┐ «)»			⇐ Cast					(char *)
+	    │ Int  │
+	    └ Cast ┘
+14	«(»┌ DecH ┐ ≪comma≫			⇐ «(»‹L«,»┌ D ┐ C«,»≪opt≫9›		(int,
+	«(»│ Int  │				          │ I │
+	«(»└  Ex  ┘				          └ E ┘
+15	‹(›┌ St  ┐				⇐ ‹(›‹hfill›┌ $LS‹ ›$ ┐			┎  ≪( k = 5;≫    ┒
+	   └ Dec ┘				            └ $LD‹ ›$ ┘			┖ ≪( int k = 5;≫ ┚
+16	UnOp ┌ Ex  ┐				⇐ Ex					┎ ≪!x≫  ┒
+	     └ Int ┘									┖ ≪~&C≫ ┚
+17	Op Cast ‹)›				⇐ Cast ‹)›‹hfill› $C=\.\{U\.\}C$ & ≪*≫‟CPtr”)
+18	Op ‹Alt2›Ex Int				⇐ ‹Alt2›Ex Int ‹hfill› \.\{$U$\.\}‹Alt2›$E$ $I$ & ‹AltM2› ≪*x≫ ≪*≫‟CPtr”
+19	Op BinOp				⇐ BinOp ‹hfill› $≪math_rel≫‹,›U\.\{B\.\}\.\}$ & ≪*=≫
+20	BinOp BinOp				⇐ BinOp ‹hfill› $≪math_rel≫‹,›‹{›B₀‹}›‹{›B₁‹}›‹}›$ & ≪>>=≫
+21	Cast ‹Alt2›‹(› Ex			⇐ ‹Alt2›‹(› Ex ‹hfill›‹Alt2› $CL$ $C‹ ›E$ & ‹AltM2› ≪(double)(x+2)≫ ≪(double)x≫
+22	Cast ‹;›				⇐ Ex ‹;› & ≪(int);≫
+23	≪sizeof_like≫ Cast			⇐ Ex & ≪sizeof (double)≫
+24	≪sizeof_like≫ Ex			⇐ Ex ‹hfill› $S‹ ›E$ & ≪sizeof x≫
+25	Int ‹Alt2›Int ≪struct_like≫		⇐ ‹Alt2›Int ≪struct_like≫ ‹hfill› $I‹ ›$‹Alt2› $I$ $S$ \unskip& ≪extern char≫
+26	Int Ex ‹Alt2›≪raw_int≫ ≪struct_like≫	⇐ Int ‹Alt2›≪raw_int≫ ≪struct_like≫ & ≪extern "Ada" int≫
+27	Int ‹Alt3›Ex Op ‹:›			⇐ DecH ‹Alt3›Ex Op ‹:›‹hfill› $D=I$‹ › & ‹AltM3›≪int x≫ ≪int*x≫ ≪unsigned:≫
+28	Int ‹Alt2›‹;› BinOp			⇐ DecH ‹Alt2›‹;› BinOp & ‹AltM2› ≪int x;≫ {‟int” $f(‟int”=4)$}
+29	≪public_like≫ ‹:›			⇐ Tag & ‟private”:
+30	≪public_like≫				⇐ Int & ‟private”
+31	‹::›‹Alt2›Ex Int			⇐ ‹Alt2›Ex Int ‹hfill› ≪qualifier≫ $C$ ‹Alt2›$E$ $I$ & \&C\DC$x$
+32	‹::›‹::›				⇐ ‹::› & \&C\DC\&B\DC
+33	DecH ≪comma≫				⇐ DecH ‹hfill› $DC‹ ›$ & ≪int x,≫
+34	DecH Op					⇐ DecH ‹hfill› $D\.\{U\.\}$ & ≪int *≫
+35†	DecH Ex					⇐ DecH ‹hfill› $DE‡$ & ≪int x≫
+36	DecH ‹Alt2›BinOp ‹:› Ex ‹Alt3›≪comma≫ ‹;›‹)›	⇐ DecH ‹Alt3›≪comma≫ ‹;›‹)›‹hfill› $D=D$‹Alt2› $B$ $C$ \unskip$E$ & ‹AltM2› {‟int” $f(‟int”\ x=2)$} ≪int b:1≫
+37	DecH Cast				⇐ DecH & ≪int f(int)≫
+38	DecH ‹Alt3›Int ‹{› Dec			⇐ FnDec ‹Alt3›Int ‹{› Dec ‹hfill› $F=D‹,›In‹,›In$ & ≪long time () {≫
+39	DecH ‹;›				⇐ Dec & ≪int n;≫
+40	Dec Dec					⇐ Dec ‹hfill› $D_1‹,›≪force≫‹,›D_2$ & ≪int n;double x;≫
+41	Dec ‹Alt2›St ≪function≫			⇐ ‹Alt2›St ≪function≫ ‹hfill› $D‹,›≪big_force≫‹,›$‹Alt2› $S$ $F$ \unskip& ‟extern” $n$; «·main·» ()≪{}≫
+42	Base ‹Alt2› Int Ex ≪comma≫		⇐ Base ‹hfill› $B$‹ ›‹Alt2› $I$ $E$ \unskip$C$‹,›≪opt≫9 & ‹AltM2› {: ‟public” \&A,} {: $i(5)$,}
+43	Base ‹Alt2› Int Ex ‹{›			⇐ ‹{›‹hfill› $B$‹ ›‹Alt2› $I$ $E$ \unskip‹ ›$L$ & \&D : ‟public” \&A $\{$
+44	≪struct_like≫ ‹{›			⇐ ≪struct_head≫ ‹hfill› $S‹ ›L$ & ≪struct {≫
+45	≪struct_like≫ ‹Alt2›Ex Int ‹;›		⇐ DecH ‹;›‹hfill› $S‹ ›$‹Alt2› $E§$ $I§$ & ‟struct” ‟forward”;
+46	≪struct_like≫ ‹Alt2›Ex Int ‹{›		⇐ ≪struct_head≫ ‹hfill› $S‹ ›$‹Alt2› $E§$ $I§$ \unskip $‹ ›L$ & ‟struct” ‟name\_info” $\{$
+47	≪struct_like≫ ‹Alt2›Ex Int ‹:›		⇐ ≪struct_like≫ ‹Alt2›Ex Int Base & ≪class≫ \&C :
+48†	≪struct_like≫ ‹Alt2›Ex Int		⇐ Int ‹hfill› $S‹ ›$‹Alt2›$E$ $I$ & ‟struct” ‟name\_info” $z$;
+49	≪struct_head≫ ‹Alt3›Dec St ≪function≫ ‹}›	⇐ Int‹hfill› $S‹,›«·in·»‹,›≪force≫$‹Alt3›$D$ $S$ $F$ $«·out·»‹,›≪force≫‹,›R$ & ≪struct {≫ declaration ≪}≫
+50	≪struct_head≫ ‹}›			⇐ Int‹hfill› $S«\,»R$ & ≪class C{}≫
+51	FnDec Dec				⇐ FnDec ‹hfill› $F‹,›≪force≫‹,›D$ & $f(z)$ ‟double” $z$;
+52	FnDec St				⇐ ≪function≫ ‹hfill› $F‹,›≪out≫‹,›≪out≫‹,›≪force≫‹,›S$ & «·main·»() {\dots}
+53	≪function≫ ‹Alt3›St Dec ≪function≫	⇐ ‹Alt3› St Dec ≪function≫ ‹hfill› $F‹,›≪big_force≫‹,›$‹Alt3› $S$ $D$ $F$ & outer block
+54	‹{›‹}›					⇐ St ‹hfill› $L«\,»R$ & empty statement
+‹MidX› += 35pt
+55	‹{› Alt3›St Dec ≪function≫ ‹}›		⇐ St ‹hfill› $≪force≫‹,›L‹,›«·in·»‹,›≪force≫‹,›S‹,› ≪force≫‹,›«·back·»‹,›R‹,›«·out·»‹,›≪force≫$ & compound statement
+‹MidX› -= 20pt
+56	‹{› Ex [≪comma≫] ‹}›			⇐ Ex & initializer
+57	If Ex					⇐ ≪if_clause≫ ‹hfill› $I\.{\ }E$ & ≪if (z)≫
+58	Else ‹:›				⇐ Else Base & ‟try” :
+59	Else ‹{›				⇐ ≪else_head≫ ‹{› & ‟else” $\{$
+60	Else St					⇐ St ‹hfill› $≪force≫‹,›E‹,›«·in·»‹,›«·bsp·»‹,›S‹,›«·out·»‹,›≪force≫$ & ≪else x=0;≫
+61	≪else_head≫ ‹Alt2›St Ex			⇐ St ‹hfill› $≪force≫‹,›E‹,›«·bsp·»‹,›≪noop≫‹,›≪cancel≫‹,›S‹,›«·bsp·»$ & ≪else{x=0;}≫
+62	≪if_clause≫ ‹{›				⇐ ≪if_head≫ ‹{› & ≪if (x) {≫
+63	≪if_clause≫ St Else If			⇐ If ‹hfill› $≪force≫‹,›I‹,›«·in·»‹,›«·bsp·»‹,›S‹,›«·out·»‹,›≪force≫‹,›E‹,›‹ ›I$ & ≪if (x) y; else if≫
+64	≪if_clause≫ St Else			⇐ Else ‹hfill› $≪force≫‹,›I‹,›«·in·»‹,›«·bsp·»‹,›S‹,›«·out·»‹,›≪force≫‹,›E$ & ≪if (x) y; else≫
+65	≪if_clause≫ St				⇐ Else St & ≪if (x)≫
+66	≪if_head≫ ‹Alt2›St Ex Else If		⇐ If ‹hfill› $≪force≫‹,›I‹,›«·bsp·»‹,›≪noop≫‹,›≪cancel≫‹,›S‹,›≪force≫‹,›E‹,›‹ ›I$ & ≪if (x){y;}else if≫
+67	≪if_head≫ ‹Alt2›St Ex Else		⇐ Else ‹hfill› $≪force≫‹,›I‹,›«·bsp·»‹,›≪noop≫‹,›≪cancel≫‹,›S‹,›≪force≫‹,›E$ & ≪if (x){y;}else≫
+68	≪if_head≫ ‹Alt2›St Ex			⇐ ≪else_head≫ ‹Alt2›St Ex & ≪if (x){y;}≫
+‹MidX› += 20pt
+69	≪do_like≫ St Else ‹;›			⇐ St ‹hfill› $D‹,›«·bsp·»‹,›≪noop≫‹,›≪cancel≫‹,›S‹,›≪cancel≫‹,›≪noop≫‹,›«·bsp·»‹,›ES$% &       ≪do f(x); while (g(x));≫
+‹MidX› -= 20pt
+70	Case ‹;›				⇐ St & ≪return;≫
+71	Case ‹:›				⇐ Tag & ≪default:≫
+72	Case Ex					⇐ Ex ‹hfill› $C‹ ›E$ & ≪return 0≫
+73	≪catch_like≫ ‹Alt2›Cast Ex		⇐ FnDec ‹hfill› $C$‹Alt2› $C$ $E$ «·in·»‹,›«·in·» & ≪catch (...)≫
+74	Tag Tag					⇐ Tag ‹hfill› $T_1‹,›«·bsp·»‹,›T_2$ & ≪case 0: case 1:≫
+75	Tag ‹Alt3›St Dec ≪function≫		⇐ ‹Alt3›St Dec ≪function≫ ‹hfill› $≪force≫‹,›«·back·»‹,›T‹,›«·bsp·»‹,›S$ & ≪case 0: z=0;≫
+76†	St ‹Alt3›St Dec ≪function≫		⇐ ‹Alt3›St Dec ≪function≫ ‹hfill› $S‹,›$‹Alt3›$≪force≫‹,›S$ $≪big_force≫‹,›D$ $≪big_force≫‹,›F$ & ≪x=1;y=2;≫
+77	‹;›					⇐ St ‹hfill› ‹ ›$S$& empty statement
+78†	≪lproc≫ ‹Alt3› If Else ≪define_like≫	⇐ ≪lproc≫ & ‹AltM3› {{\bf \#include}} {\bf\#else} {\bf\#define}
+79	≪lproc≫ ≪rproc≫				⇐ Insert & {\bf\#endif}
+80	≪lproc≫ ‹Alt2› {Ex [Ex]} ≪function≫ ≪rproc≫	⇐ Insert ‹hfill› $I$‹ ›‹Alt2› {$E{[\.{\ \\5}E]}$} {$F$} & ‹AltM2›{{\bf\#define} $a$‹enspace› 1} {{\bf\#define} $a$‹enspace›$\{‹,›b;‹,›\}$}
+81	≪section_scrap≫ ‹;›			⇐ St‹hfill› $MS$ ≪force≫ &$\langle‹,›$section name$‹,›\rangle$;
+82	≪section_scrap≫				⇐ Ex &$\langle‹,›$section name$‹,›\rangle$
+83	Insert ≪any≫				⇐ ≪any≫ & \.{‹|›\#include‹|›}
+84	≪prelangle≫				⇐ BinOp ‹hfill› \.< & $<$ not in template
+85	≪prerangle≫				⇐ BinOp ‹hfill› \.> & $>$ not in template
+86	≪langle≫ ≪prerangle≫			⇐ Cast ‹hfill› $L«\,»P$ & $\langle‹,›\rangle$
+87	≪langle≫ ‹Alt3›DecH Int Ex ≪prerangle≫	⇐ Cast & $\langle‟class”‹,›\&C\rangle$
+88	≪langle≫ ‹Alt3›DecH Int Ex ≪comma≫	⇐ ≪langle≫ ‹hfill› $L$‹,›‹Alt3› $D$ $I$ $E$ $C$‹,›≪opt≫9 & $\langle‟class”‹,›\&C,$
+89	≪template_like≫ Ex ≪prelangle≫		⇐ ≪template_like≫ Ex ≪langle≫ & ‟template” $a\langle100\rangle$
+90	≪template_like≫ ‹Alt2›Ex ≪raw_int≫	⇐ ‹Alt2›Ex ≪raw_int≫ ‹hfill› $T$‹ ›‹Alt2›$E$ $R$ & \&C\DC‟template” ≪a()≫
+91	≪template_like≫				⇐ ≪raw_int≫ & ‟template”$\langle‟class”‹,›\&T\rangle$
+92	≪new_like≫ ‹(› Ex ‹)›			⇐ ≪new_like≫ & ‟new”(«·nothrow·»)
+93	≪new_like≫ Cast				⇐ Ex ‹hfill› $N‹ ›C$ & ≪new(int*)≫
+94†	≪new_like≫				⇐ ≪new_exp≫ & ‟new” \&C≪()≫
+95	≪new_exp≫ ‹Alt2›Int Const		⇐ ≪new_exp≫ ‹hfill› $N$‹ ›‹Alt2› $I$ $C$ & ≪new const int≫
+96	≪new_exp≫ ≪struct_like≫ ‹Alt2› Ex Int	⇐ ≪new_exp≫ ‹hfill› $N‹ ›S$‹ ›‹Alt2› $E$ $I$ & ‟new” ‟struct” \&S
+97	≪new_exp≫ ≪raw_ubin≫			⇐ ≪new_exp≫ ‹hfill› $N\.\{R\.\}$ & ≪new int*[2]≫
+98	≪new_exp≫ ‹Alt2›‹(› Ex			⇐ Ex ‹Alt2›‹(› Ex ‹hfill› $E=N$‹,›‹Alt2› {} {‹ ›} & ‹AltM2› ≪operator[](int)≫ {≪new int(2)≫}
+99†	≪new_exp≫				⇐ Ex & ≪new int;≫
+100	≪ftemplate≫ ≪prelangle≫			⇐ ≪ftemplate≫ ≪langle≫ & ≪make_pair<int,int>≫
+101	≪ftemplate≫				⇐ Ex & ≪make_pair(1,2)≫
+102	≪for_like≫ Ex				⇐ Else ‹hfill› $F‹ ›E$ & ≪while (1)≫
+103	≪raw_ubin≫ Const			⇐ ≪raw_ubin≫ ‹hfill› $RC$\.{‹ ›} & $*$‟const” ≪x≫
+104	≪raw_ubin≫				⇐ Op & $*$ ≪x≫
+105	Const					⇐ Int & ‟const” ≪x≫
+106	≪raw_int≫ ≪prelangle≫			⇐ ≪raw_int≫ ≪langle≫ & \&C$\langle$
+107	≪raw_int≫ ‹::›				⇐ ‹::› & \&C\DC
+108	≪raw_int≫ Cast				⇐ ≪raw_int≫ & \&C$\langle‟class”\ \&T\rangle$
+109	≪raw_int≫ ‹(›				⇐ Ex ‹(› & ‟complex”$(x,y)$
+110†	≪raw_int≫				⇐ Int   & ‟complex” ≪z≫
+111†	≪operator_like≫ ‹Alt3›BinOp UnOp Op	⇐ Ex ‹hfill› $O$\.\{‹Alt3› $B$ $U$ $U$ \unskip\.\} & ≪operator+≫
+112	≪operator_like≫ ‹Alt2›≪new_like≫ ≪delete_like≫	⇐ Ex ‹hfill› $O$‹ ›‹Alt2› $N$ $S$ & ≪operator delete≫
+113	≪operator_like≫ ≪comma≫			⇐ Ex & ‟operator”,
+114†	≪operator_like≫				⇐ ≪new_exp≫ & ≪operator char *≫
+‹MidX› -= 8pt
+115	≪typedef_like≫ ‹Alt2›Int Cast ‹Alt2›≪comma≫ ‹;›	⇐ ≪typedef_like≫ Ex ‹Alt2›≪comma≫ ‹;› & ‟typedef” ‟int” \&I,
+‹MidX› += 8pt
+116	≪typedef_like≫ Int			⇐ ≪typedef_like≫ ‹hfill› $T‹ ›I$ & ‟typedef” ‟char”
+117†	≪typedef_like≫ Ex			⇐ ≪typedef_like≫ ‹hfill› $T‹ ›E§$ & ‟typedef” \&I \.{@@[@@]} (≪*≫\&P)
+118	≪typedef_like≫ ≪comma≫			⇐ ≪typedef_like≫ ‹hfill› $TC‹ ›$ & ‟typedef” ‟int” \&x,
+119	≪typedef_like≫ ‹;›			⇐ Dec & ‟typedef” ‟int” $\&x,\&y$;
+120	≪typedef_like≫ Op ‹Alt2› Cast Op	⇐ ≪typedef_like≫ ‹Alt2› Cast Op ‹hfill›‹Alt2› $C=\.\{U\.\}C$ $U_2=\.\{U_1\.\}U_2$ \unskip & ‟typedef” ≪*≫{}≪*≫(‟CPtr”)
+121	≪delete_like≫ ‹(›‹)›			⇐ ≪delete_like≫‹hfill› $DL«\,»R$ & ‟delete”≪[]≫
+122	≪delete_like≫ Ex			⇐ Ex ‹hfill› $D‹ ›E$ & ≪delete p≫
+123†	≪question≫ Ex ‹Alt2›‹:› Base		⇐ BinOp & ‹AltM2› ≪?x:≫ ≪?f():≫
+124	≪begin_arg≫ ≪end_arg≫			⇐ Ex & \.{@@[}‟char”$*$\.{@@]}
+125	≪any_other≫ ≪end_arg≫			⇐ ≪end_arg≫ &    ‟char”$*$\.{@@]}
+
+«·Notes·»†
+†35	The Ex must not be immediately followed by ‹(›, Ex, or Cast.
+†48	The Ex or Int must not be immediately followed by Base.
+†76	The ≪force≫ in the St line becomes «·bsp·» if \.{CWEAVE} has been invoked with the \.{-f} option.
+†78	The ≪define_like≫ case calls ≪make_underlined≫ on the following scrap.
+†94	The ≪new_like≫ must not be immediately followed by ‹(›.
+†99	The ≪new_exp≫ must not be immediately followed by ≪raw_int≫, ≪struct_like≫, or ‹::›.
+†110	The ≪raw_int≫ must not be immediately followed by ≪langle≫.
+†111	The operator after ≪operator_like≫ must not be immediately followed by a BinOp.
+†114	The ≪operator_like≫ must not be immediately followed by ≪raw_ubin≫.
+†117	The Ex must not be immediately followed by ‹(›, Ex, or Cast.
+†123	The mathness of the ‹:› or Base changes to `yes'.

@@ -1,0 +1,330 @@
+Enveloping Repository:
+TeXLive: https://github.com/TeX-Live
+∙	installer/
+	Installer of TeX Live - for issues please contact the tex-live mailing list at tug.org
+	Perl 9 11 1 2 Updated Apr 4, 2021
+∙	texlive-source/
+	source part of the TeX Live subversion repository - for issues please contact the tex-k mailing list at tug.org
+	C 29 125 4 2 Updated Apr 4, 2021
+∙	tlcontrib/
+	TeX Live contrib repository
+	TeX 0 0 0 0 Updated Apr 3, 2021
+∙	luatex/
+	Mirror of luatex svn to git - for issues please contact the luatex mailing list
+	C GPL-2.0 5 37 0 0 Updated Apr 2, 2021
+∙	texdoc/
+	Find and view documentation in TeX Live
+	search pdf help documents texlive cui
+	Lua GPL-3.0 2 30 4 (1 issue needs help) 0 Updated Apr 1, 2021
+∙	tl-neo4j/
+	Neo4j representation of the TeX Live Database
+	Perl 1 0 0 0 Updated Mar 22, 2021
+∙	babelbib/
+	Multilingual bibliographies: The babelbib package
+	TeX 1 0 0 0 Updated Jan 7, 2021
+∙	tlcockpit/
+	GUI for tlmgr written in Scala
+	gui scala texlive tlmgr
+	Scala GPL-3.0 2 24 6 0 Updated May 5, 2020
+∙	yhmath/
+	Development of the yhmath package
+	TeX 0 1 2 0 Updated Mar 17, 2020
+∙	xetex/
+	mirror of git://git.code.sf.net/p/xetex/code
+	C++ 6 8 0 0 Updated Jan 20, 2020
+∙	yfonts/
+	Support for old German fonts
+	TeX 0 0 0 0 Updated Apr 4, 2019
+∙	g-brief/
+	TeX 0 0 0 0 Updated Mar 16, 2019
+∙	yinit/
+	Development of the yinit package
+	0 4 1 0 Updated Mar 7, 2019
+∙	tl-go/
+	Go stuff for TeX Live
+	Go 2 3 0 0 Updated Jan 21, 2019
+∙	sync-scripts/
+	Scripts for the SVN to GIT syncronization
+	Shell 0 0 0 0 Updated Dec 3, 2018
+∙	colorprofiles/
+	TeX 0 0 0 0 Updated Nov 5, 2018
+∙	luatex-old Archived/
+	Mirror of luatex svn to git, updated around every 30min
+	C GPL-2.0 1 3 0 0 Updated Sep 12, 2018
+∙	tltesting/
+	Development of testing infrastructure for TeX (Live)
+	Perl 0 9 0 0 Updated Feb 18, 2017
+
+The TeXLive Source (as of 2021/04/04):
+https://github.com/TeX-Live/texlive-source
+It is Public Domain
+∙	am/
+	omit $Id$ in generated output; it is useful, but too painful to commi…
+	Jun 7, 2020
+	―	ChangeLog
+	―	README
+	―	bin_links.am
+	―	dist_hook.am
+	―	hdr_links.am
+	―	man.am
+	―	man1_links.am
+	―	rebuild.am
+	―	reconfig.am
+	―	recurse.am
+	―	script_links.am
+∙	auxdir/auxsub/
+	automake 1.16.3
+	Nov 19, 2020
+	―	Makefile.am
+	―	Makefile.in
+	―	README
+	―	aclocal.m4
+	―	configure
+	―	configure.ac
+∙	build-aux/
+	tl-update-auto
+	Mar 13, 2021
+	―	README.TL
+	―	ar-lib
+	―	compile
+	―	config.guess
+	―	config.sub
+	―	depcomp
+	―	install-sh
+	―	ltmain.sh
+	―	missing
+	―	relpath
+	―	test-driver
+	―	texinfo.tex
+	―	ylwrap 
+∙	doc/
+	doc updates for 2021
+	Feb 27, 2021
+	―	tlbuild-incl/
+		▪	install-tl.texi
+		▪	tlmgr.texi 
+	―	ChangeLog
+	―	Makefile.am
+	―	Makefile.in
+	―	README.solaris
+	―	build-tools.txt
+	―	buildinfo.sh
+	―	splitinfo.gawk
+	―	tlbuild.info
+	―	tlbuild.texi
+∙	libs/
+	tl-update-auto
+	Mar 13, 2021
+	―	cairo/
+	―	freetype2/
+	―	gd/
+	―	gmp/
+	―	graphite2/
+	―	harfbuzz/
+	―	icu/
+	―	libpaper/
+	―	libpng/
+	―	lua53/
+	―	luajit/
+	―	mpfr/
+	―	pixman/
+	―	pplib/
+	―	teckit/
+	―	xpdf/
+	―	zlib/
+	―	zziplib/
+	―	ChangeLog
+	―	Makefile.am
+	―	Makefile.in
+	―	README
+	―	aclocal.m4
+	―	configure
+	―	configure.ac 
+∙	m4/
+	debugging line if configure not found in subdir
+	Feb 10, 2021
+	―	ChangeLog
+	―	README
+	―	ax_cxx_compile_stdcxx.m4
+	―	kpse-asm.m4
+	―	kpse-cairo-flags.m4
+	―	kpse-common.m4
+	―	kpse-cross.m4
+	―	kpse-cxx-hack.m4
+	―	kpse-dll-name.m4
+	―	kpse-fontconfig-flags.m4
+	―	kpse-freetype2-flags.m4
+	―	kpse-gd-flags.m4
+	―	kpse-gmp-flags.m4
+	―	kpse-graphite2-flags.m4
+	―	kpse-harfbuzz-flags.m4
+	―	kpse-icu-flags.m4
+	―	kpse-kpathsea-flags.m4
+	―	kpse-largefile.m4
+	―	kpse-lex.m4
+	―	kpse-lib-version.m4
+	―	kpse-libpaper-flags.m4
+	―	kpse-libpng-flags.m4
+	―	kpse-lt-hack.m4
+	―	kpse-lua52-flags.m4
+	―	kpse-lua53-flags.m4
+	―	kpse-luajit-flags.m4
+	―	kpse-macos-framework.m4
+	―	kpse-mktex.m4
+	―	kpse-mpfr-flags.m4
+	―	kpse-options.m4
+	―	kpse-pixman-flags.m4
+	―	kpse-pkgs.m4
+	―	kpse-pplib-flags.m4
+	―	kpse-progs.m4
+	―	kpse-ptexenc-flags.m4
+	―	kpse-search-libs.m4
+	―	kpse-setup.m4
+	―	kpse-size-max.m4
+	―	kpse-socket-libs.m4
+	―	kpse-teckit-flags.m4
+	―	kpse-visibility.m4
+	―	kpse-warnings.m4
+	―	kpse-web2c.m4
+	―	kpse-win32.m4
+	―	kpse-xpdf-flags.m4
+	―	kpse-zlib-flags.m4
+	―	kpse-zziplib-flags.m4
+	―	libtool.m4
+	―	ltoptions.m4
+	―	ltsugar.m4
+	―	ltversion.m4
+	―	lt~obsolete.m4 
+∙	texk/
+	[CTIE] Include TeX Live versionstring in banner line.
+	Apr 4, 2021
+	―	afm2pl/
+	―	bibtex-x/
+	―	chktex/
+	―	cjkutils/
+	―	detex/
+	―	dtl/
+	―	dvi2tty/
+	―	dvidvi/
+	―	dviljk/
+	―	dviout-util/
+	―	dvipdfm-x/
+	―	dvipng/
+	―	dvipos/
+	―	dvipsk/
+	―	dvisvgm/
+	―	gregorio/
+	―	gsftopk/
+	―	kpathsea/
+	―	lcdf-typetools/
+	―	makeindexk/
+	―	makejvf/
+	―	mendexk/
+	―	musixtnt/
+	―	ps2pk/
+	―	psutils/
+	―	ptexenc/
+	―	seetexk/
+	―	tests/
+	―	tex4htk/
+	―	texlive/
+	―	ttf2pk2/
+	―	ttfdump/
+	―	upmendex/
+	―	web2c/
+	―	xdvik/
+	―	ChangeLog
+	―	Makefile.am
+	―	Makefile.in
+	―	README
+	―	aclocal.m4
+	―	configure
+	―	configure.ac 
+∙	utils/
+	asy 2.70 sources
+	Mar 15, 2021
+	―	asymptote/
+	―	autosp/
+	―	axodraw2/
+	―	devnag/
+	―	lacheck/
+	―	m-tx/
+	―	pmx/
+	―	ps2eps/
+	―	t1utils/
+	―	texdoctk/
+	―	tpic2pdftex/
+	―	vlna/
+	―	xindy/
+	―	xml2pmx/
+	―	xpdfopen/
+	―	ChangeLog
+	―	Makefile.am
+	―	Makefile.in
+	―	README
+	―	aclocal.m4
+	―	configure
+	―	configure.ac 
+∙	.gitignore
+	tweak .gitignore, README
+	Jan 30, 2021
+∙	.travis.yml
+	doc,sync
+	Mar 21, 2020
+∙	Build
+	fix TL_TRGTE type in Build, thanks to github user svenper
+	Jun 27, 2019
+∙	ChangeLog
+	declare TL21=21-03-23
+	Mar 23, 2021
+∙	Makefile.am
+	do not run texlinks if it is not installed
+	May 28, 2020
+∙	Makefile.in
+	reautoconf
+	Feb 8, 2021
+∙	README
+	doc,sync
+	Mar 8, 2021
+∙	README.0overview
+	2020 tlbuild update
+	Mar 13, 2020
+∙	README.1prerequisites
+	doc updates for 2021
+	Feb 27, 2021
+∙	README.2building
+	doc updates for 2021
+	Feb 27, 2021
+∙	README.3installing
+	2020 tlbuild update
+	Mar 13, 2020
+∙	README.4layout
+	doc updates for 2021
+	Feb 27, 2021
+∙	README.5configure
+	doc updates for 2021
+	Feb 27, 2021
+∙	README.6coding
+	2020 tlbuild update
+	Mar 13, 2020
+∙	README.7continuous
+	2020 tlbuild update
+	Mar 13, 2020
+∙	aclocal.m4
+	automake 1.16.3
+	Nov 19, 2020
+∙	configure
+	tardate 2021
+	Mar 24, 2021
+∙	configure.ac
+	show compiler versions in summary if easy
+	Oct 21, 2014
+∙	reautoconf
+	towards TL2010: build system
+	Nov 10, 2009
+∙	tardate.ac
+	tardate 2021
+	Mar 24, 2021
+∙	version.ac
+	tl2021 version updates
+	Feb 17, 2021

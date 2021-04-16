@@ -1,0 +1,72 @@
+	‹@*›		begin a new module with progress report; i.e. section.
+	‹@ ›‹@\t›	begin a new module; i.e. sub-section.
+	‹@'›		octal constant prefix.
+	‹@"›		hexadecimal constant prefix.
+	‹@d›‹@D›	macro definition.
+	‹@f›‹@F›	format definition.
+	‹@p›‹@P›	module code in an unnamed module.
+	‹@0›‹@1›‹@2›	debug-only control codes.
+	‹@x›‹@y›‹@z›	control codes used in update files.
+	‹@t›‹@T›	control text: «TeX» embedded in module code.
+	‹@$›		string pool check sum prefix.
+	‹@!›		definition flag on.
+	‹@?›		definition flag off.
+	‹@|›		math formula break.
+	‹@/›		line break in module code.
+	‹@\›		line break in module code.
+	‹@&›		token paste.
+	‹@<›		begin a module name.
+	‹@>›		end a module name.
+	‹@#›		line break with vertical space.
+	‹@=›		begin verbatim code.
+	‹@+›		line paste with space.
+	‹@;›		invisible semicolon.
+	‹@,›		thin space in module code.
+	‹@^›		index entry: normal font.
+	‹@:›		index entry: user format.
+	‹@.›		index entry: typewriter font.
+
+	‹@@›		‛@’, itself.
+	‹@{›		begin a comment.
+	‹@}›		end a comment.
+
+Pascal changes:
+	^.* {.*}$
+	==
+	:=
+	<>
+	<=
+	>=
+	<
+	>
+	=
+	+
+	-
+	mod
+	div
+	not
+	and
+	or
+	{...}
+	if ... then
+	while ... do
+	repeat ... until
+	for ... (downto|to) ... do
+	case ... of (K,...,K:)* (default *) endcases
+	begin ... end
+TeX changes:
+	``.*''
+	`.*'
+	\.{...}
+	\&{...}
+	{\mc ... }
+	{\sl ... }
+	\PASCAL
+	\TeX
+	\...
+Other changes
+	stat ⋯ tats
+	debug ⋯ gubed
+	|...|
+	incr
+	decr

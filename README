@@ -1,0 +1,17 @@
+These are some of the core files used for TeX, rewritten in straight-line pseudo code in a C-like language.
+They are meant for display and reference only, though they will be used as the core of a rewrite.
+The section/subsection numbering reflect the hierarchy in the *.web and *.w files; but do not normally display as such when the files are self-compiled into *.{tex,dvi,pdf}.
+
+These are what the web files would look like if they were rewritten in c + Comments, with the hyperlinks removed.
+
+The relation of the reworked files to the originals are:
+WEB:
+	tangle.web → Tangle.c
+	weave.web → Weave.c
+C-WEB:
+	ctangle.w → CTangle.c
+	cweave.w → CWeave.c
+	common.w → Common.c
+
+The programs are rendered in more mathematical form (using UTF-8 UNICODE), as they are in the displays of the *.w and *.web files.
+More details will be included here shortly on the relation between the C operators and their UNICODE versions.
