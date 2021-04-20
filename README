@@ -6,12 +6,17 @@ These are what the web files would look like if they were rewritten in c + Comme
 
 The relation of the reworked files to the originals are:
 WEB:
-	tangle.web → Tangle.c
-	weave.web → Weave.c
+	tangle.web → TangleC.txt → Tangle.c
+	weave.web → WeaveC.txt → Weave.c
 C-WEB:
-	ctangle.w → CTangle.c
-	cweave.w → CWeave.c
-	common.w → Common.c
+	ctangle.w → CTangleC.txt → CTangle.c
+	cweave.w → CWeaveC.txt → CWeave.c
+	common.w → Common{C,H}.txt → Common.c
 
 The programs are rendered in more mathematical form (using UTF-8 UNICODE), as they are in the displays of the *.w and *.web files.
-More details will be included here shortly on the relation between the C operators and their UNICODE versions.
+The operators
+	↑, ↓, ≡, ≠, ≤, ≥, ∧, ∨, ←, →, ⊃, ⊂
+correspond, respectively, to the C operators:
+	++, --, ==, !=, <=, >=, &&, ||, =, ->, >>, <<
+and respectively to the Pascal operators in all but the last 3 cases:
+	inc(⋯), dec(⋯), =, <>, <=, >=, and, or, :=

@@ -633,7 +633,7 @@ name_pointer id_lookup(eight_bits t) {	// finds current identifier
       enum {0..buf_size} i ← id_first;	// index into ≪buffer≫
       enum {0..max_bytes} k ← byte_start[p];	// index into ≪byte_mem[]≫
       enum {ww} w ← p%ww;	// segment of ≪byte_mem[]≫
-      for (; i < id_loc && buffer[i] ≡ byte_mem[w][k]; i↑, k↑);
+      for (; i < id_loc ∧ buffer[i] ≡ byte_mem[w][k]; i↑, k↑);
       if (i ≡ id_loc) break;	// all characters agree
    // 6.7‡
    }
@@ -642,9 +642,9 @@ name_pointer id_lookup(eight_bits t) {	// finds current identifier
       link[p] ← hash[h], hash[h] ← p;	// insert ≪p≫ at beginning of hash list
    }
 // 6.6‡
-   if (p ≡ name_ptr || t ≠ normal) {
+   if (p ≡ name_ptr ∨ t ≠ normal) {
    // ‡6.8: Update the tables and check for possible errors
-      if (p ≠ name_ptr && t ≠ normal && ilk[p] ≡ normal || p ≡ name_ptr && t ≡ normal && buffer[id_first] ≠ '"') {
+      if (p ≠ name_ptr ∧ t ≠ normal ∧ ilk[p] ≡ normal ∨ p ≡ name_ptr ∧ t ≡ normal ∧ buffer[id_first] ≠ '"') {
       // ‡6.9: Compute the secondary hash code ≪h≫ and put the first characters into the auxiliary array ≪chopped_id≫
       // The following routine, which is called into play when it is necessary to look at the secondary hash table,
       // computes the same hash function as before (but on the chopped data),
@@ -652,7 +652,7 @@ name_pointer id_lookup(eight_bits t) {	// finds current identifier
          enum {0..buf_size} i ← id_first;	// index into ≪buffer[]≫
          enum {0..unambig_length} s ← 0;	// index into ≪chopped_id≫
          h ← 0;
-         for (; i < id_loc && s < unambig_length; i↑) if (buffer[i] ≠ '_') {
+         for (; i < id_loc ∧ s < unambig_length; i↑) if (buffer[i] ≠ '_') {
             chopped_id[s] ← buffer[i] ≥ 'a'? buffer[i] - 0x20: buffer[i];
             h ← (h + h + chopped_id[s↑])%hash_size;
          }
@@ -686,14 +686,14 @@ name_pointer id_lookup(eight_bits t) {	// finds current identifier
       // ‡6.12: Enter a new identifier into the table at position ≪p≫
       // The following routine could make good use of a generalized ≪pack≫ procedure
       // that puts items into just part of a packed array instead of the whole thing.
-         if (t ≡ normal && buffer[id_first] ≠ '"') {
+         if (t ≡ normal ∧ buffer[id_first] ≠ '"') {
          // ‡6.13: Check for ambiguity and update secondary hash
             for (enum {name_pointer} q ← chop_hash[h]; q ≠ 0; q ← equiv[q]) {
             // ‡6.14: Check if ≪q≫ conflicts with ≪p≫
                enum {0..max_bytes} k ← byte_start[q];	// index into ≪byte_mem[]≫
                enum {0..unambig_length} s ← 0;	// index into ≪chopped_id≫
                enum {ww} w ← q%ww;	// segment of ≪byte_mem[]≫
-               for (; k < byte_start[q + ww] && s < unambig_length; k↑)  {
+               for (; k < byte_start[q + ww] ∧ s < unambig_length; k↑)  {
                   eight_bits c ← byte_mem[w][k];	// byte being chopped
                   if (c ≠ '_') {
                      if (c ≥ 'a') c -= 0x20;	// merge lowercase with uppercase
@@ -701,7 +701,7 @@ name_pointer id_lookup(eight_bits t) {	// finds current identifier
                      s↑;
                   }
                }
-               if (k ≠ byte_start[q + ww] || chopped_id[s] ≡ 0) {
+               if (k ≠ byte_start[q + ww] ∨ chopped_id[s] ≡ 0) {
                   print("\n! Identifier conflict with ");
                   for (k ← byte_start[q] ⋯ byte_start[q + ww] - 1) print(xchr[byte_mem[w][k]]);
                   error(), q ← 0;	// only one conflict will be printed, since ≪equiv[0] ≡ 0≫
@@ -739,7 +739,7 @@ name_pointer id_lookup(eight_bits t) {	// finds current identifier
                   write(pool, "%c", xchr[buffer[i]]);	// output characters of string
                   pool_check_sum += pool_check_sum + buffer[i];
                   while (pool_check_sum > check_sum_prime) pool_check_sum -= check_sum_prime;
-                  if (buffer[i] ≡ '"' || buffer[i] ≡ '@') i↑;	// omit second appearance of doubled character
+                  if (buffer[i] ≡ '"' ∨ buffer[i] ≡ '@') i↑;	// omit second appearance of doubled character
                }
                write(pool, "\n");
             }
@@ -809,7 +809,7 @@ enum {less.extension} MatchNames(name_pointer p, sixteen_bits l) {
    enum {less..extension} c ← equal;
    enum {ww} w ← p%ww;	// segment of ≪byte_mem[]≫
    enum {0..longest_name} j ← 1;	// index into ≪mod_text≫
-   for (; k < byte_start[p + ww] && j ≤ l && mod_text[j] ≡ byte_mem[w][k]; k↑, j↑);
+   for (; k < byte_start[p + ww] ∧ j ≤ l ∧ mod_text[j] ≡ byte_mem[w][k]; k↑, j↑);
    return
       k ≡ byte_start[p + ww]? j > l? equal: extension:
       j > l? prefix:
@@ -1095,8 +1095,8 @@ sixteen_bits get_output(void) {	// returns next token after macro expansion
             // First we pop the stack if necessary until getting to a level that hasn't ended.
             // Then the next character must be a ‛‹(›’;
             // and since parentheses are balanced on each level, the entire parameter must be present, so we can copy it without difficulty.
-               while (cur_byte ≡ cur_end && stack_ptr > 0) pop_level();
-               if (stack_ptr ≡ 0 || tok_mem[zo][cur_byte] ≠ '(') {
+               while (cur_byte ≡ cur_end ∧ stack_ptr > 0) pop_level();
+               if (stack_ptr ≡ 0 ∨ tok_mem[zo][cur_byte] ≠ '(') {
                   print("\n! No parameter given for "), print_id(a), error();
                   continue;
                }
@@ -1251,7 +1251,7 @@ inline void check_break(void) {
 
 void flush_buffer(void) {	// writes one line to output file
    enum {0..out_buf_size} b ← break_ptr;	// value of ≪break_ptr≫ upon entry
-   if (semi_ptr ≠ 0 && out_ptr-semi_ptr ≤ line_length) break_ptr ← semi_ptr;
+   if (semi_ptr ≠ 0 ∧ out_ptr-semi_ptr ≤ line_length) break_ptr ← semi_ptr;
    for (enum {0..out_buf_size} k ∈ break_ptr) write(Pascal_file, "%c", xchr[out_buf[k]]);
    write(Pascal_file, "\n"), line↑;
    if (line%100 ≡ 0) {
@@ -1311,12 +1311,12 @@ void send_out(eight_bits t, sixteen_bits v) {	// outputs ≪v≫ of type ≪t≫
    switch (out_state) {
       case sign_val_val:
       // ‡10.11: Reduce ≪sign_val_val≫ to ≪sign_val≫
-         if (t ≡ frac ||
+         if (t ≡ frac ∨
          // ‡10.12: Contribution is ‹*› or ‹/› or ‹DIV› or ‹MOD›
-            t ≡ ident && v ≡ 3 && (
-               out_contrib[1] ≡ 'D' && out_contrib[2] ≡ 'I' && out_contrib[3] ≡ 'V' ||
-               out_contrib[1] ≡ 'M' && out_contrib[2] ≡ 'O' && out_contrib[3] ≡ 'D'
-            ) || t ≡ misc && (v ≡ '*' || v ≡ '/')
+            t ≡ ident ∧ v ≡ 3 ∧ (
+               out_contrib[1] ≡ 'D' ∧ out_contrib[2] ≡ 'I' ∧ out_contrib[3] ≡ 'V' ∨
+               out_contrib[1] ≡ 'M' ∧ out_contrib[2] ≡ 'O' ∧ out_contrib[3] ≡ 'D'
+            ) ∨ t ≡ misc ∧ (v ≡ '*' ∨ v ≡ '/')
          // 10.12‡
          ) {
             BufferOutVal(); // Append ≪out_val≫ to buffer
@@ -1348,7 +1348,7 @@ void send_out(eight_bits t, sixteen_bits v) {	// outputs ≪v≫ of type ≪t≫
    if (t ≠ misc) for (enum {0..line_length} k ← 1 ⋯ v) app(out_contrib[k]);
    else app(v);
    check_break();
-   if (t ≡ misc && (v ≡ ';' || v ≡ '}')) semi_ptr ← out_ptr, break_ptr ← out_ptr;
+   if (t ≡ misc ∧ (v ≡ ';' ∨ v ≡ '}')) semi_ptr ← out_ptr, break_ptr ← out_ptr;
    out_state ←
       t ≥ ident? num_or_id:	// ≪t ≡ ident≫ or ≪frac≫
       misc	// ≪t ≡ str≫ or ≪misc≫
@@ -1358,7 +1358,7 @@ void send_out(eight_bits t, sixteen_bits v) {	// outputs ≪v≫ of type ≪t≫
 // Editor's Note:
 // ∙	This was orginally a multiply-used module.
 inline void BufferOutVal(void) {
-   if (out_val < 0 || out_val ≡ 0 && last_sign < 0) app('-');
+   if (out_val < 0 ∨ out_val ≡ 0 ∧ last_sign < 0) app('-');
    else if (out_sign > 0) app(out_sign);
    app_val(abs(out_val)), check_break();
 }
@@ -1383,10 +1383,10 @@ void send_val(integer v) {	// output the (signed) value ≪v≫
    switch (out_state) {
       case num_or_id:
       // ‡10.17: If previous output was ‹DIV› or ‹MOD›, ≪goto bad_case≫
-         if (out_ptr ≡ break_ptr + 3 || out_ptr ≡ break_ptr + 4 && out_buf[break_ptr] ≡ ' ')
+         if (out_ptr ≡ break_ptr + 3 ∨ out_ptr ≡ break_ptr + 4 ∧ out_buf[break_ptr] ≡ ' ')
             if (
-               out_buf[out_ptr - 3] ≡ 'D' && out_buf[out_ptr - 2] ≡ 'I' && out_buf[out_ptr - 1] ≡ 'V' ||
-               out_buf[out_ptr - 3] ≡ 'M' && out_buf[out_ptr - 2] ≡ 'O' && out_buf[out_ptr - 1] ≡ 'D'
+               out_buf[out_ptr - 3] ≡ 'D' ∧ out_buf[out_ptr - 2] ≡ 'I' ∧ out_buf[out_ptr - 1] ≡ 'V' ∨
+               out_buf[out_ptr - 3] ≡ 'M' ∧ out_buf[out_ptr - 2] ≡ 'O' ∧ out_buf[out_ptr - 1] ≡ 'D'
             ) goto bad_case;
       // 10.17‡
          out_sign ← ' ', out_state ← sign_val, out_val ← v, break_ptr ← out_ptr,
@@ -1394,7 +1394,7 @@ void send_val(integer v) {	// output the (signed) value ≪v≫
       break;
       case misc:
       // ‡10.16: If previous output was ‹*› or ‹/›, ≪goto bad_case≫
-         if (out_ptr ≡ break_ptr + 1 && (out_buf[break_ptr] ≡ '*' || out_buf[break_ptr] ≡ '/')) goto bad_case;
+         if (out_ptr ≡ break_ptr + 1 ∧ (out_buf[break_ptr] ≡ '*' ∨ out_buf[break_ptr] ≡ '/')) goto bad_case;
       // 10.16‡
          out_sign ← 0, out_state ← sign_val, out_val ← v, break_ptr ← out_ptr,
          last_sign ← +1;
@@ -1448,7 +1448,7 @@ void send_the_output(void) {
             enum {0..max_bytes} j ← byte_start[cur_val];	// index into ≪byte_mem[]≫
             enum {ww} w ← cur_val%ww;	// segment of ≪byte_mem[]≫
             enum {0..line_length} k ← 0;	// index into ≪out_contrib≫
-            while (k < max_id_length && j < byte_start[cur_val + ww]) {
+            while (k < max_id_length ∧ j < byte_start[cur_val + ww]) {
                out_contrib[↑k] ← byte_mem[w][j↑];
                if (out_contrib[k] ≥ 'a') out_contrib[k] -= 0x20;
                else if (out_contrib[k] ≡ '_') k↓;
@@ -1466,7 +1466,7 @@ void send_the_output(void) {
                if (n ≥ 0xccccccc) err_print("! Constant too big");
                else n ← 10*n + cur_char;
                cur_char ← get_output();
-            } while (cur_char ≤ '9' && cur_char ≥ '0');
+            } while (cur_char ≤ '9' ∧ cur_char ≥ '0');
             send_val(n), k ← 0;
             if (cur_char ≡ 'e') cur_char ← 'E';
             if (cur_char ≡ 'E') goto get_fraction;
@@ -1481,7 +1481,7 @@ void send_the_output(void) {
                if (n ≥ 0x10000000) err_print("! Constant too big");
                else n ← 010*n + cur_char;
                cur_char ← get_output();
-            } while (cur_char ≤ '7' && cur_char ≥ '0');
+            } while (cur_char ≤ '7' ∧ cur_char ≥ '0');
             send_val(n);
          }
          goto reswitch;
@@ -1494,7 +1494,7 @@ void send_the_output(void) {
                if (n ≥ 0x8000000) err_print("! Constant too big");
                else n ← 0x10*n + cur_char;
                cur_char ← get_output();
-            } while (cur_char ≤ 'F' && cur_char ≥ '0' && (cur_char ≤ '9' || cur_char ≥ 'A'));
+            } while (cur_char ≤ 'F' ∧ cur_char ≥ '0' ∧ (cur_char ≤ '9' ∨ cur_char ≥ 'A'));
             send_val(n);
          }
          goto reswitch;
@@ -1502,7 +1502,7 @@ void send_the_output(void) {
          case '.':
             k ← 1, out_contrib[1] ← '.', cur_char ← get_output();
             if (cur_char ≡ '.') out_contrib[2] ← '.', send_out(str, 2);
-            else if (cur_char ≥ '0' && cur_char ≤ '9') goto get_fraction;
+            else if (cur_char ≥ '0' ∧ cur_char ≤ '9') goto get_fraction;
             else { send_out(misc, '.'); goto reswitch; }
          break;
       // 11.8‡
@@ -1528,7 +1528,7 @@ void send_the_output(void) {
             do {
                if (k < line_length) k↑;
                out_contrib[k] ← get_output();
-            } while (out_contrib[k] ≠ '\'' && stack_ptr ≠ 0);
+            } while (out_contrib[k] ≠ '\'' ∧ stack_ptr ≠ 0);
             if (k ≡ line_length) err_print("! String too long");
             send_out(str, k); cur_char ← get_output();
             if (cur_char ≡ '\'') out_state ← unbreakable;
@@ -1580,7 +1580,7 @@ void send_the_output(void) {
             do {
                if (k < line_length) k↑;
                out_contrib[k] ← get_output();
-            } while (out_contrib[k] ≠ verbatim && stack_ptr ≠ 0);
+            } while (out_contrib[k] ≠ verbatim ∧ stack_ptr ≠ 0);
             if (k ≡ line_length) err_print("! Verbatim string too long");
             send_out(str, k↓);
          // 11.7‡
@@ -1604,11 +1604,11 @@ void send_the_output(void) {
             do {
                if (k < line_length) k↑;
                out_contrib[k] ← cur_char, cur_char ← get_output();
-               if (out_contrib[k] ≡ 'E' && (cur_char ≡ '+' || cur_char ≡ '-')) {
+               if (out_contrib[k] ≡ 'E' ∧ (cur_char ≡ '+' ∨ cur_char ≡ '-')) {
                   if (k < line_length) k↑;
                   out_contrib[k] ← cur_char; cur_char ← get_output();
                } else if (cur_char ≡ 'e') cur_char ← 'E';
-            } while (cur_char ≡ 'E' || cur_char ≥ '0' && cur_char ≤ '9');
+            } while (cur_char ≡ 'E' ∨ cur_char ≥ '0' ∧ cur_char ≤ '9');
             if (k ≡ line_length) err_print("! Fraction too long");
             send_out(frac, k);
          // 11.9‡
@@ -1678,9 +1678,9 @@ void prime_the_change_buffer(void) {
       if (!input_ln(change_file)) return;
       if (limit < 2) continue;
       if (buffer[0] ≠ '@') continue;
-      if (buffer[1] ≥ 'X' && buffer[1] ≤ 'Z') buffer[1] += 'z' - 'Z';	// lowercasify
+      if (buffer[1] ≥ 'X' ∧ buffer[1] ≤ 'Z') buffer[1] += 'z' - 'Z';	// lowercasify
       if (buffer[1] ≡ 'x') break;
-      if (buffer[1] ≡ 'y' || buffer[1] ≡ 'z') loc ← 2, err_print("! Where is the matching @x?");
+      if (buffer[1] ≡ 'y' ∨ buffer[1] ≡ 'z') loc ← 2, err_print("! Where is the matching @x?");
    }
 // 12.7‡12.8: Skip to the next nonblank line; ≪return≫ if end of file
 // Here we are looking at lines following the ‹@x›.
@@ -1722,9 +1722,9 @@ void check_change(void) {	// switches to ≪change_file≫ if the buffers match
          return;
       }
    // ‡12.11: If the current line starts with ‹@y›, report any discrepancies and ≪return≫
-      if (limit > 1 && buffer[0] ≡ '@') {
-         if (buffer[1] ≥ 'X' && buffer[1] ≤ 'Z') buffer[1] += 'z' - 'Z';	// lowercasify
-         if (buffer[1] ≡ 'x' || buffer[1] ≡ 'z') loc ← 2, err_print("! Where is the matching @y?");
+      if (limit > 1 ∧ buffer[0] ≡ '@') {
+         if (buffer[1] ≥ 'X' ∧ buffer[1] ≤ 'Z') buffer[1] += 'z' - 'Z';	// lowercasify
+         if (buffer[1] ≡ 'x' ∨ buffer[1] ≡ 'z') loc ← 2, err_print("! Where is the matching @y?");
          else if (buffer[1] ≡ 'y') {
             if (n > 0) loc ← 2, err_print("! Hmm... %1d of the preceding lines failed to match", n);
             return;
@@ -1753,9 +1753,9 @@ void get_line(void) {	// inputs the next line
             err_print("! Change file ended without @z");
             buffer[0] ← '@', buffer[1] ← 'z', limit ← 2;
          }
-         if (limit > 1 && buffer[0] ≡ '@') { // check if the change has ended
-            if (buffer[1] ≥ 'X' && buffer[1] ≤ 'Z') buffer[1] += 'z' - 'Z';	// lowercasify
-            if (buffer[1] ≡ 'x' || buffer[1] ≡ 'y') loc ← 2, err_print("! Where is the matching @z?");
+         if (limit > 1 ∧ buffer[0] ≡ '@') { // check if the change has ended
+            if (buffer[1] ≥ 'X' ∧ buffer[1] ≤ 'Z') buffer[1] += 'z' - 'Z';	// lowercasify
+            if (buffer[1] ≡ 'x' ∨ buffer[1] ≡ 'y') loc ← 2, err_print("! Where is the matching @z?");
             else if (buffer[1] ≡ 'z') prime_the_change_buffer(), change_changing();
          }
       // 12.15‡
@@ -1764,7 +1764,7 @@ void get_line(void) {	// inputs the next line
    // ‡12.14: Read from ≪web_file≫ and maybe turn on ≪changing≫
       line↑;
       if (!input_ln(web_file)) input_has_ended ← true;
-      else if (limit ≡ change_limit && buffer[0] ≡ change_buffer[0] && change_limit > 0) check_change();
+      else if (limit ≡ change_limit ∧ buffer[0] ≡ change_buffer[0] ∧ change_limit > 0) check_change();
    // 12.14‡
       if (!changing) break;
    }
@@ -1823,7 +1823,7 @@ eight_bits skip_ahead(void) {	// skip to next control code
       if (loc ≤ limit) {
          loc += 2;
          eight_bits c ← control_code(buffer[loc - 1]);	// control code found
-         if (c ≠ ignore || buffer[loc - 1] ≡ '>') return c;
+         if (c ≠ ignore ∨ buffer[loc - 1] ≡ '>') return c;
       }
    }
    return new_module;
@@ -1849,12 +1849,12 @@ void skip_comment(void) {	// skips to next unmatched ‛‹}›’
    // ‡12.20: Do special things when ≪c ≡ '@', '\', '{', '}'≫; ≪return≫ at end
       if (c ≡ '@') {
          c ← buffer[loc];
-         if (c ≠ ' ' && c ≠ tab_mark && c ≠ '*' && c ≠ 'z' && c ≠ 'Z') loc↑;
+         if (c ≠ ' ' ∧ c ≠ tab_mark ∧ c ≠ '*' ∧ c ≠ 'z' ∧ c ≠ 'Z') loc↑;
          else {
             err_print("! Section ended in mid-comment");
             loc↓; return;
          }
-      } else if (c ≡ '\\' && buffer[loc] ≠ '@') loc↑;
+      } else if (c ≡ '\\' ∧ buffer[loc] ≠ '@') loc↑;
       else if (c ≡ '{') bal↑;
       else if (c ≡ '}') {
          if (bal ≡ 0) return;
@@ -1894,7 +1894,7 @@ eight_bits get_next(void) {	// produces the next input token
       eight_bits c ← buffer[loc↑];	// the current character
       if (scanning_hex) {
       // ‡13.4: Return if ≪c≫ is a hexadecimal digit, otherwise set ≪scanning_hex ← false≫
-         if (c ≥ '0' && c ≤ '9' || c ≥ 'A' && c ≤ 'F') Return(c);
+         if (c ≥ '0' ∧ c ≤ '9' ∨ c ≥ 'A' ∧ c ≤ 'F') Return(c);
          scanning_hex ← false
       // 13.4‡
       }
@@ -1906,9 +1906,9 @@ eight_bits get_next(void) {	// produces the next input token
          // ‡13.6: Get an identifier
          // We have to look at the preceding character to make sure this isn't part of a real constant,
          // before trying to find an identifier starting with ‛‹e›’ or ‛‹E›’.
-            if ((c ≡ 'e' || c ≡ 'E') && loc > 1 && buffer[loc - 2] ≤ '9' && buffer[loc - 2] ≥ '0') Return('E');	// exponent of a real constant
+            if ((c ≡ 'e' ∨ c ≡ 'E') ∧ loc > 1 ∧ buffer[loc - 2] ≤ '9' ∧ buffer[loc - 2] ≥ '0') Return('E');	// exponent of a real constant
             id_first ← ↓loc;
-            for (eight_bits d; (d ← buffer[↑loc]) ≥ '0' && (d ≤ '9' || d ≥ 'A') && (d ≤ 'Z' || d ≥ 'a') && d ≤ 'z' || d ≡ '_'; );
+            for (eight_bits d; (d ← buffer[↑loc]) ≥ '0' ∧ (d ≤ '9' ∨ d ≥ 'A') ∧ (d ≤ 'Z' ∨ d ≥ 'a') ∧ d ≤ 'z' ∨ d ≡ '_'; );
             if (loc > id_first + 1) { id_loc ← loc; Return(identifier); }
          // 13.6‡
          }
@@ -1920,7 +1920,7 @@ eight_bits get_next(void) {	// produces the next input token
             double_chars ← 0, id_first ← loc - 1;
             do {
                eight_bits d ← buffer[loc↑];	// the next character
-               if (d ≡ '"' || d ≡ '@') {
+               if (d ≡ '"' ∨ d ≡ '@') {
                   if (buffer[loc] ≡ d) loc↑, d ← 0, double_chars↑;
                   else if (d ≡ '@') err_print("! Double @ sign missing");
                } else if (loc > limit) err_print("! String constant didn't end"), d ← '"';
@@ -1951,14 +1951,14 @@ eight_bits get_next(void) {	// produces the next input token
                   if (d ≡ '@') {
                      d ← buffer[loc + 1];
                      if (d ≡ '>') { loc += 2; break; }
-                     if (d ≡ ' ' || d ≡ tab_mark || d ≡ '*') {
+                     if (d ≡ ' ' ∨ d ≡ tab_mark ∨ d ≡ '*') {
                         err_print("! Section name didn't end"); break;
                      }
                      mod_text[↑k] ← '@', loc↑;	// now ≪d ≡ buffer[loc]≫ again
                   }
                // 13.12‡
                   loc↑; if (k < longest_name - 1) k↑;
-                  if (d ≡ ' ' || d ≡ tab_mark) {
+                  if (d ≡ ' ' ∨ d ≡ tab_mark) {
                      d ← ' '; if (mod_text[k - 1] ≡ ' ') k↓;
                   }
                   mod_text[k] ← d;
@@ -1970,9 +1970,9 @@ eight_bits get_next(void) {	// produces the next input token
                   print("..."), mark_harmless();
                }
             // 13.13‡
-               if (mod_text[k] ≡ ' ' && k > 0) k↓;
+               if (mod_text[k] ≡ ' ' ∧ k > 0) k↓;
             // 13.11‡
-               if (k > 3) cur_module ← mod_text[k] ≡ '.' && mod_text[k - 1] ≡ '.' && mod_text[k - 2] ≡ '.'? prefix_lookup(k - 3): mod_lookup(k);
+               if (k > 3) cur_module ← mod_text[k] ≡ '.' ∧ mod_text[k - 1] ≡ '.' ∧ mod_text[k - 2] ≡ '.'? prefix_lookup(k - 3): mod_lookup(k);
                else cur_module ← mod_lookup(k);
             // 13.9‡
             } else if (c ≡ control_text) {
@@ -2063,7 +2063,7 @@ void scan_numeric(name_pointer p) {	// defines numeric macros
          case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': {
          // ‡14.5: Set ≪val≫ to value of decimal constant, and set ≪next_control≫ to the following token
             integer val ← 0;	// constants being evaluated
-            do val ← 10*val + next_control - '0', next_control ← get_next(); while (next_control ≤ '9' && next_control ≥ '0')
+            do val ← 10*val + next_control - '0', next_control ← get_next(); while (next_control ≤ '9' ∧ next_control ≥ '0')
          // 14.5‡
             add_in(val);
          }
@@ -2072,7 +2072,7 @@ void scan_numeric(name_pointer p) {	// defines numeric macros
          // ‡14.6: Set ≪val≫ to value of octal constant, and set ≪next_control≫ to the following token
             integer val ← 0;	// constants being evaluated
             next_control ← '0';
-            do val ← 010*val + next_control - '0', next_control ← get_next(); while (next_control ≤ '7' && next_control ≥ '0')
+            do val ← 010*val + next_control - '0', next_control ← get_next(); while (next_control ≤ '7' ∧ next_control ≥ '0')
          // 14.6‡
             add_in(val);
          }
@@ -2084,7 +2084,7 @@ void scan_numeric(name_pointer p) {	// defines numeric macros
             do {
                if (next_control ≥ 'A') next_control += '0' + 10 - 'A';
                val ← 0x10*val + next_control - '0', next_control ← get_next();
-            } while (next_control ≤ 'F' && next_control ≥ '0' && (next_control ≤ '9' || next_control ≥ 'A'))
+            } while (next_control ≤ 'F' ∧ next_control ≥ '0' ∧ (next_control ≤ '9' ∨ next_control ≥ 'A'))
          // 14.7‡
             add_in(val);
          }
@@ -2182,7 +2182,7 @@ void scan_repl(eight_bits t) {	// creates a replacement text
                buffer[limit + 1] ← '@';
                while (true)
                   if (buffer[loc] ≠ '@') app_repl(buffer[loc↑]);
-                  else if (loc < limit && buffer[loc + 1] ≡ '@') app_repl('@'), loc += 2;
+                  else if (loc < limit ∧ buffer[loc + 1] ≡ '@') app_repl('@'), loc += 2;
                   else break;
                if (loc ≥ limit) err_print("! Verbatim string didn't end");
                else if (buffer[loc + 1] ≠ '>') err_print("! You should double @ signs in verbatim strings");
@@ -2253,7 +2253,7 @@ void scan_module(void) {
          define_macro(simple); continue;
       } else {
       // ‡16.4: If the next text is ‛≪(#)==≫’, call ≪define_macro()≫ and ≪continue≫
-         if (next_control ≡ '(' && (next_control ← get_next()) ≡ '#' && (next_control ← get_next()) ≡ ')') {
+         if (next_control ≡ '(' ∧ (next_control ← get_next()) ≡ '#' ∧ (next_control ← get_next()) ≡ ')') {
             next_control ← get_next();
             if (next_control ≡ '=') err_print("! Use ≡ for macros"), next_control ← equivalence_sign;
             if (next_control ≡ equivalence_sign) { define_macro(parametric); continue; }
@@ -2270,7 +2270,7 @@ void scan_module(void) {
          p ← cur_module;
       // ‡16.6: Check that ≪=≫ or ≪==≫ follows this module name, otherwise ≪return≫
          do next_control ← get_next(); while (next_control ≡ '+');	// allow optional ‛‹+=›’
-         if (next_control ≠ '=' && next_control ≠ equivalence_sign) {
+         if (next_control ≠ '=' ∧ next_control ≠ equivalence_sign) {
             err_print("! Pascal text flushed, = sign is missing");
             do next_control ← skip_ahead(); while (next_control ≠ new_module);
             return;

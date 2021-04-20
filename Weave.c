@@ -101,7 +101,7 @@ const int stack_size = 200;	// number of simultaneous output levels
 // Editor's Note:
 // ∙	Labels in C (unlike «Pas») are largely subsumed by the «·break·», «·continue·» and «·return·» statements in C,
 //	and are self-declaring, so that declarations of them are not required here.
-// ∙	The generic labels stull used are for:
+// ∙	The generic labels still used are for:
 //	―	«·restart·»	// for the very beginning of a procedure
 //	―	«·reswitch·»	// for the top of a «·switch·» statement that is being used as a finite-state control
 //	―	«·found·»	// for jumps out of successful search loops

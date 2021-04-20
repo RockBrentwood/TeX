@@ -1,6 +1,6 @@
 (1) The rules are context-sensitive, with the following forms (stated with their context-sensitive equivalents), where
 	-	q, q` and q´ are non-terminals,
-	-	x is a terminal and x⁺ is a sequence of 1 or more termnals and
+	-	x is a terminal and x⁺ is a sequence of 1 or more terminals and
 	-	α is a non-empty sequence of terminals and non-terminals.
 	-	λ is the empty sequnce
 Syntax Rules:
@@ -20,7 +20,8 @@ Lexical Rules:
 
 (3) No one non-terminal is the start symbol ― they all are.
 	-	This is a grammar for μx↑·f↑(x↑), where x↑ is the vector of all the non-terminals.
-	-	Macro bodies are parsed as expressions or statements, wherever possible.
+	-	In the reworked versions of the web files, macro bodies are parsed as expressions or statements, wherever possible,
+		which entails a few small changes from the original.
 
 (4) The following is a rough equivalent to a Prolog-like DCT grammar.
 	-	The syntax rules are numbered, as in the weave.web file; rule 33 is mistakenly named by weave.web as 31 (I sent Knuth a bug note).
@@ -29,7 +30,7 @@ Lexical Rules:
 	-	‛comment’	= not a category code; but is combined with a previous ‛omega’ or ‛semi’, or following ‛terminator’; or else is inserted as a ‛terminator’.
 	-	The symbols denoted here by < ⁆ ! ‼ x X † ¦ - ↔ o + are respectively named:
 			‛indent’ ‛outdent’ ‛force’ ‛big_force’ ‛cancel’ ‛big_cancel’ ‛opt’ ‛break_space’ ‛backup’ ‛math_rel’ ‛math_op’ ‛math_bin’
-	-	‛math_rel’ ‛math_op’ ‛math_bin’ are rendered internally as ‛\mathbin{’ ‛\mathrel{’ ‛\mathop{’, respectively.
+	-	‛math_rel’ ‛math_bin’ ‛math_op’ are rendered internally as ‛\mathrel{’ ‛\mathbin{’ ‛\mathop{’, respectively.
 	-	‛indent’ ‛outdent’ ‛opt’ ‛backup’ ‛break_space’ ‛force’ ‛big_force’ are rendered ‛\1’ ‛\2’ ‛\3’ ‛\4’ ‛\5’ ‛\6’ ‛\7’, respectively.
 	-	A special ‛end_translation’ token marks the end of text: ‟comment” consisting of ‛cancel’ or ‛force’.
 	-	The byte-code text associated with each item is listed as ‹⋯›; including terminals.
